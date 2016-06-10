@@ -4,8 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace KnugenAfGrottan
 {
@@ -47,11 +45,12 @@ namespace KnugenAfGrottan
         static Text bamEnemy;
         public static int attackChoice;
         public static int enemyAttackChoice;
+        public static int[] playerStats;
 
         /// <summary>
         /// Gameelements Initilizer
         /// </summary>
-        public static void Initilize()
+        public static void Initialize()
         {
             combatEnemyList = new List<CombatEnemy>();
             playerStats = new int[5];
@@ -65,6 +64,7 @@ namespace KnugenAfGrottan
         public static void LoadContent (ContentManager content, GameWindow window)
         {
             Save.SaveFile(playerStats);
+
 
             background = new BackgroundSprite(content.Load<Texture2D>("images/world/backgrounds/BackgroundTiles"), 0, 0);
             menu = new Menu((int)State.Menu);

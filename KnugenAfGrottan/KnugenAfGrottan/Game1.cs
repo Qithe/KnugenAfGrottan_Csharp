@@ -34,7 +34,7 @@ namespace KnugenAfGrottan
         /// </summary>
         protected override void Initialize()
         {
-            GameElements.Initalize();
+            GameElements.Initialize();
             base.Initialize();
         }
 
@@ -46,8 +46,7 @@ namespace KnugenAfGrottan
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             GameElements.LoadContent(Content, Window);
-
-            // TODO: use this.Content to load your game content here
+            
         }
 
         /// <summary>
@@ -66,24 +65,66 @@ namespace KnugenAfGrottan
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            // For Mobile devices, this logic will close the Game when the Back button is pressed
+            // Exit() is obsolete on iOS
+#if !__IOS__
+            if ((GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                Keyboard.GetState().IsKeyDown(Keys.Escape)) && GameElements.currentState != GameElements.State.Combat)
+            {
+                GameElements.currentState = GameElements.State.Menu;
+            }
+#endif
 
-            // TODO: Add your update logic here
+            switch (GameElements.currentState)
+            {
+                case GameElements.State.World:
+                    GameElements.currentState = GameElements.UpdateWorld(Content, Window, gameTime);
+                    break;
+                case GameElements.State.Combat:
+                    GameElements.currentState = GameElements.UpdateCombat(Content, Window, gameTime);
+                    break;
+                case GameElements.State.Quit:
+                    this.Exit();
+                    break;
+                default:
+                    GameElements.currentState = GameElements.UpdateMenu(gameTime);
+                    break;
+            }
+
+            /*if (GameElements.combat) {
+				GameElements.currentState = GameElements.State.Combat;
+			}
+			else {
+				GameElements.currentState = GameElements.State.World;
+			}*/
 
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+        protected override void Draw (GameTime gameTime)
+        {
+            graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            spriteBatch.Begin();
+
+            switch (GameElements.currentState)
+            {
+                case GameElements.State.World:
+                    GameElements.DrawWorld(spriteBatch);
+                    break;
+                case GameElements.State.Combat:
+                    GameElements.DrawCombat(spriteBatch);
+                    break;
+                case GameElements.State.Quit:
+                    this.Exit();
+                    break;
+                default:
+                    GameElements.DrawMenu(spriteBatch);
+                    break;
+            }
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
